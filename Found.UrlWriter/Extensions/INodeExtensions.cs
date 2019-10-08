@@ -2,9 +2,11 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
+using Core = Umbraco.Core;
+using Umbraco.Core.Models;
+using Umbraco.Core.Services;
+using Umbraco.Core.Models.PublishedContent;
 using umbraco.cms.businesslogic.web;
-using umbraco.interfaces;
-using umbraco.NodeFactory;
 
 namespace InfoCaster.Umbraco.UrlTracker.Extensions
 {
@@ -15,20 +17,16 @@ namespace InfoCaster.Umbraco.UrlTracker.Extensions
         /// </summary>
         /// <param name="node">The current node</param>
         /// <returns>The root node</returns>
-        public static Node GetRootNode(this INode node)
+        public static IPublishedContent GetRootNode(this IPublishedContent node)
         {
+        
             if (node == null)
                 throw new ArgumentNullException("node");
 
-            INode parent = node;
+           return  node.GetRootNode();
 
-            while (parent != null)
-            {
-                node = parent;
-                parent = node.Parent;
-            }
 
-            return (Node)node;
+          
         }
 
         /// <summary>
@@ -36,19 +34,19 @@ namespace InfoCaster.Umbraco.UrlTracker.Extensions
         /// </summary>
         /// <param name="node">The current node</param>
         /// <returns>The closest ancestor or self with a host name set, or the root node if no hostnames are set</returns>
-        public static Node GetDomainRootNode(this INode node)
+        public static IPublishedContent GetDomainRootNode(this IPublishedContent node)
         {
             if (node == null)
                 throw new ArgumentNullException("node");
 
-            INode parent = node;
-            INode deepParent = node;
-            INode deepNode = node;
+            IPublishedContent parent = node;
+            IPublishedContent deepParent = node;
+            IPublishedContent deepNode = node;
             while (parent != null)
             {
                 Domain[] domains = Domain.GetDomainsById(parent.Id);
                 if (domains != null && domains.Any()){
-                    node= (Node)parent;
+                    node= (IPublishedContent)parent;
                     break;
                 }
                 node = parent;
@@ -59,7 +57,7 @@ namespace InfoCaster.Umbraco.UrlTracker.Extensions
                 {
                     Domain[] domains = Domain.GetDomainsById(deepParent.Parent.Id);
                     if (domains != null && domains.Any()){
-                        deepNode = (Node)deepParent;
+                        deepNode = (IPublishedContent)deepParent;
                         break;
                     }
                     deepNode = deepParent;
@@ -74,7 +72,7 @@ namespace InfoCaster.Umbraco.UrlTracker.Extensions
             //    node = deepNode;
             //}
 
-            return (Node)node;
+            return node;
         }
     }
 }

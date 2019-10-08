@@ -15,6 +15,7 @@ using umbraco.cms.businesslogic.web;
 using umbraco.DataLayer;
 using umbraco.NodeFactory;
 using Umbraco.Core;
+using Umbraco.Core.Composing;
 using Umbraco.Core.Events;
 using Umbraco.Core.Models;
 using Umbraco.Core.Publishing;
@@ -23,7 +24,7 @@ using Umbraco.Web.UI.Pages;
 
 namespace InfoCaster.Umbraco.UrlTracker
 {
-    public class UrlTrackerApplicationEventHandler : ApplicationEventHandler
+    public class UrlTrackerApplicationEventHandler : IUserComposer
     {
         protected ClientTools ClientTools
         {
@@ -199,6 +200,11 @@ namespace InfoCaster.Umbraco.UrlTracker
         void Domain_AfterDelete(Domain sender, umbraco.cms.businesslogic.DeleteEventArgs e)
         {
             UmbracoHelper.ClearDomains();
+        }
+
+        public void Compose(Composition composition)
+        {
+            composition.Components().Append<RegisterUrlTrackerEvents>();
         }
     }
 }
